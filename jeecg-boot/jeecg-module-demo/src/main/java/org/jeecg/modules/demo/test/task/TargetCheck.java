@@ -1,8 +1,7 @@
 package org.jeecg.modules.demo.test.task;
 
-
-import com.litesoftwares.coingecko.CoinGeckoApiClient;
-import com.litesoftwares.coingecko.impl.CoinGeckoApiClientImpl;
+import cn.hutool.http.HttpRequest;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.jeecg.common.util.SpringContextUtils;
 import org.jeecg.modules.demo.test.entity.BigThingsWeb3;
@@ -31,24 +30,27 @@ public class TargetCheck implements Job {
         List<BigThingsWeb3> list = iBigThingsWeb3Service.list();
         Map<String, BigThingsWeb3> collect1 = list.stream().collect(Collectors.toMap(BigThingsWeb3::getSymbol, v -> v));
         String collect = list.stream().map(BigThingsWeb3::getSymbol).collect(Collectors.joining(","));
-        CoinGeckoApiClient geckoPriceFetcher = new CoinGeckoApiClientImpl();
-        Map<String, Map<String, Double>> price = geckoPriceFetcher.getPrice(collect, "usd");
-        price.forEach((k, v) -> {
-            System.out.println(k + " : " + v.get("usd"));
-            BigThingsWeb3 bigThingsWeb3 = collect1.get(k);
+
+        String url = "https://api.coingecko.com/api/v3/simple/price?ids=" + collect+ "&vs_currencies=usd";
+        String response = HttpRequest.get(url).execute().body();
+        JSONObject jsonObject = JSONObject.parseObject(response);
+
+        for (String key : jsonObject.keySet()) {
+            Double usd = jsonObject.getJSONObject(key).getDouble("usd");
+            BigThingsWeb3 bigThingsWeb3 = collect1.get(key);
             if (bigThingsWeb3 != null) {
                 String monitorUrl = bigThingsWeb3.getMonitorUrl();
                 String[] split = StringUtils.split(monitorUrl, ",");
                 for (String s : split) {
                     String[] split1 = s.split("=");
                     if ("target".equals(split1[0])) {
-                        if (Double.parseDouble(split1[1]) < v.get("usd") * 1.15 && Double.parseDouble(split1[1]) > v.get("usd") * 0.85) {
-                            WeiXinAlert.getInstance().sendMessage("币种" + k + "价格" + v.get("usd") + "已经达到目标价位" + split1[1], AlertType.EOS_ALERT);
+                        if (Double.parseDouble(split1[1]) <usd * 1.15 && Double.parseDouble(split1[1]) > usd * 0.85) {
+                            WeiXinAlert.getInstance().sendMessage("币种" + s + "价格" + usd + "已经达到目标价位" + split1[1], AlertType.EOS_ALERT);
                         }
                     }
                 }
             }
-        });
+        }
 
     }
 }
