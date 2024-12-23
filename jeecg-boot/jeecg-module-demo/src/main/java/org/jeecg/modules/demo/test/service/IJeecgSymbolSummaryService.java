@@ -2,6 +2,7 @@ package org.jeecg.modules.demo.test.service;
 
 import org.jeecg.common.system.base.service.JeecgService;
 import org.jeecg.modules.demo.test.entity.GatePilotSymbol;
+import org.jeecg.modules.demo.test.entity.SummaryVO;
 
 
 /**
@@ -10,7 +11,7 @@ import org.jeecg.modules.demo.test.entity.GatePilotSymbol;
  * @Date:  2018-12-29
  * @Version: V1.0
  */
-public interface IJeecgGatePilotService extends JeecgService<GatePilotSymbol> {
+public interface IJeecgSymbolSummaryService extends JeecgService<SummaryVO> {
 
-    GatePilotSymbol search(String griffain);
+    SummaryVO search(String griffain,String hour);
 }
