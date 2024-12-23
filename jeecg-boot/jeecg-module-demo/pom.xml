@@ -21,6 +21,11 @@
             <artifactId>jeecg-system-biz</artifactId>
             <version>3.7.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.litesoftwares</groupId>
+            <artifactId>coingecko-java</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 

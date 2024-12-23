@@ -44,6 +44,11 @@
 			<groupId>org.jeecgframework.jimureport</groupId>
 			<artifactId>jimureport-nosql-starter</artifactId>
 		</dependency>-->
+		<dependency>
+			<groupId>com.litesoftwares</groupId>
+			<artifactId>coingecko-java</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	
 </project>

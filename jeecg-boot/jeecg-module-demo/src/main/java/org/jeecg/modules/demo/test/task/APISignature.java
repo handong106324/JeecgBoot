@@ -25,7 +25,7 @@ public class APISignature {
             String sign = generateSignature(timestamp, method, url, body, secretKey);
             String s = HttpRequest.get(url)
                     .header("OK-ACCESS-KEY", apiKey)
-//                    .header("OK-ACCESS-SIGN",sign)
+                    .header("OK-ACCESS-SIGN",sign)
 //                    .header("OK-ACCESS-TOKEN",sign)
                     .header("OK-ACCESS-PASSPHRASE",passphrase)
                     .header("OK-ACCESS-TIMESTAMP", timestamp)
