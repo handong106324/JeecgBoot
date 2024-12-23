@@ -1,5 +1,6 @@
 package org.jeecg.modules.demo.test.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
@@ -18,17 +19,24 @@ public class SummaryVO  extends JeecgEntity implements Serializable {
 
     private String symbol;
 
+    @TableField("suspiciousTagHolderAmount")
     private String suspiciousTagHolderAmount;
 
+    @TableField("top10HoldAmountPercentage")
     private String top10HoldAmountPercentage;
 
+    @TableField("top30HoldAmountPercentage")
     private String top30HoldAmountPercentage;
 
+    @TableField("top50HoldAmountPercentage")
     private String top50HoldAmountPercentage;
 
+    @TableField("sniperTagHolderAmount")
     private String sniperTagHolderAmount;
 
+    @TableField("totalHolderAmount")
     private String totalHolderAmount;
 
+    @TableField("dateTimeForHour")
     private String dateTimeForHour;
 }

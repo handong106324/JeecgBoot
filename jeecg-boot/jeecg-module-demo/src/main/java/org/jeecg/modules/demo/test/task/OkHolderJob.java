@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jeecg.common.util.SpringContextUtils;
 import org.jeecg.modules.demo.test.entity.GatePilotSymbol;
 import org.jeecg.modules.demo.test.entity.HolderRank;
@@ -49,16 +50,20 @@ public class OkHolderJob implements Job {
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 		IJeecgGatePilotService bean = SpringContextUtils.getBean(IJeecgGatePilotService.class);
-		GatePilotSymbol search = bean.search(parameter);
-		if (null != search) {
-            try {
-                walletParse(search);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-			log.error(parameter + " not found");
+		String[] split = StringUtils.split(parameter, ",");
+		for (String s : split) {
+			GatePilotSymbol search = bean.search(s);
+			if (null != search) {
+				try {
+					walletParse(search);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			} else {
+				log.error(parameter + " not found");
+			}
 		}
+
 	}
 
 	private static String HOLDER_HEADER = "https://www.okx.com/priapi/v1/dx/market/v2/holders/ranking-list?chainId=501&tokenAddress=";
@@ -79,6 +84,7 @@ public class OkHolderJob implements Job {
 		String s = HttpRequest.get(HOLDER_HEADER + symbol.getAddress())
 				.header("OK-ACCESS-KEY", apiKey)
 				.header("OK-ACCESS-TOKEN",sign)
+				.header("OK-ACCESS-SIGN",sign)
 				.header("OK-ACCESS-PASSPHRASE",passphrase)
 				.header("OK-ACCESS-TIMESTAMP", timestamp)
 				.execute().body();
@@ -122,14 +128,16 @@ public class OkHolderJob implements Job {
 	}
 
 	public static void main(String[] args) {
-		GatePilotSymbol gatePilotSymbol = new GatePilotSymbol();
-		gatePilotSymbol.setShowPair("GRIFFAIN_USDT");
-		gatePilotSymbol.setAddress("KENJSUYLASHUMfHyy5o4Hp2FdNqZg1AsUPhfH2kYvEP");
-		OkHolderJob okHolderJob = new OkHolderJob();
-        try {
-            okHolderJob.walletParse(gatePilotSymbol);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+
+		System.out.println(APISignature.doGet(HOLDER_HEADER + "KENJSUYLASHUMfHyy5o4Hp2FdNqZg1AsUPhfH2kYvEP"));
+//		GatePilotSymbol gatePilotSymbol = new GatePilotSymbol();
+//		gatePilotSymbol.setShowPair("GRIFFAIN_USDT");
+//		gatePilotSymbol.setAddress("KENJSUYLASHUMfHyy5o4Hp2FdNqZg1AsUPhfH2kYvEP");
+//		OkHolderJob okHolderJob = new OkHolderJob();
+//        try {
+//            okHolderJob.walletParse(gatePilotSymbol);
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
     }
 }

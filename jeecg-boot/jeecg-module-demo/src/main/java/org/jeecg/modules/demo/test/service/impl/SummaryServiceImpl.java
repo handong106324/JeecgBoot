@@ -22,7 +22,7 @@ public class SummaryServiceImpl extends ServiceImpl<SummaryMapper, SummaryVO> im
     @Override
     public SummaryVO search(String griffain,String dateTime) {
         QueryWrapper<SummaryVO> gatePilotSymbolQueryWrapper = new QueryWrapper<>();
-        gatePilotSymbolQueryWrapper.eq("show_pair", griffain).eq("hour", dateTime);
+        gatePilotSymbolQueryWrapper.eq("symbol", griffain).eq("dateTimeForHour", dateTime);
         return getOne(gatePilotSymbolQueryWrapper);
     }
 }
