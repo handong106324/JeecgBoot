@@ -51,8 +51,8 @@ spring:
     # 定时任务发送邮件
     timeJobSend: false
     host: smtp.163.com
-    username: jeecgos@163.com
-    password: ??
+    username: 15210732675@163.com
+    password: Woailijing1314
     properties:
       mail:
         smtp:

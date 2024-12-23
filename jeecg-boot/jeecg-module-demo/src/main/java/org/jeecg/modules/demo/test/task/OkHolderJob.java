@@ -15,6 +15,9 @@ import org.jeecg.modules.demo.test.entity.HolderRank;
 import org.jeecg.modules.demo.test.entity.SummaryVO;
 import org.jeecg.modules.demo.test.service.IJeecgGatePilotService;
 import org.jeecg.modules.demo.test.service.IJeecgSymbolSummaryService;
+import org.jeecg.modules.message.util.PushMsgUtil;
+import org.jeecg.modules.system.alert.AlertType;
+import org.jeecg.modules.system.alert.WeiXinAlert;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -37,6 +40,7 @@ import java.util.List;
 @Slf4j
 public class OkHolderJob implements Job {
 
+	PushMsgUtil pushMsgUtil;
 	/**
 	 * 若参数变量名修改 QuartzJobController中也需对应修改
 	 */
@@ -49,6 +53,7 @@ public class OkHolderJob implements Job {
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+		pushMsgUtil = SpringContextUtils.getBean(PushMsgUtil.class);
 		IJeecgGatePilotService bean = SpringContextUtils.getBean(IJeecgGatePilotService.class);
 		String[] split = StringUtils.split(parameter, ",");
 		for (String s : split) {
@@ -111,7 +116,7 @@ public class OkHolderJob implements Job {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:00:00");
 		summaryVO.setDateTimeForHour(simpleDateFormat.format(new Date()));
 
-		System.out.println(summaryVO);
+		WeiXinAlert.getInstance().sendMessage(JSONObject.toJSONString(summaryVO, SerializerFeature.PrettyFormat), AlertType.BTC_ALERT);
 
 		IJeecgSymbolSummaryService bean = SpringContextUtils.getBean(IJeecgSymbolSummaryService.class);
 		if (null != bean) {
