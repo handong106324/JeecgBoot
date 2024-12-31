@@ -41,6 +41,9 @@ import java.util.List;
 public class OkHolderJob implements Job {
 
 	PushMsgUtil pushMsgUtil;
+
+	private static String BASE_INDEX = "8453";
+	private static String SOL_INDEX = "501";
 	/**
 	 * 若参数变量名修改 QuartzJobController中也需对应修改
 	 */
@@ -82,11 +85,15 @@ public class OkHolderJob implements Job {
 		String body = ""; // GET 请求没有 body
 		String timestamp = Instant.now().atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
 
+		String url = HOLDER_HEADER;
+		if ("BASE".equals(symbol.getChain())) {
+			url = changeToBase(url);
+		}
 		// 生成签名
-		String sign = APISignature.generateSignature(timestamp, method, HOLDER_HEADER + symbol.getAddress(), body, secretKey);
+		String sign = APISignature.generateSignature(timestamp, method, url + symbol.getAddress(), body, secretKey);
 
 
-		String s = HttpRequest.get(HOLDER_HEADER + symbol.getAddress())
+		String s = HttpRequest.get(url + symbol.getAddress())
 				.header("OK-ACCESS-KEY", apiKey)
 				.header("OK-ACCESS-TOKEN",sign)
 				.header("OK-ACCESS-SIGN",sign)
@@ -132,9 +139,13 @@ public class OkHolderJob implements Job {
 
 	}
 
+	public static String changeToBase(String header) {
+		return header.replace(SOL_INDEX, BASE_INDEX);
+	}
+
 	public static void main(String[] args) {
 
-		System.out.println(APISignature.doGet(HOLDER_HEADER + "KENJSUYLASHUMfHyy5o4Hp2FdNqZg1AsUPhfH2kYvEP"));
+		System.out.println(APISignature.doGet(changeToBase(HOLDER_HEADER) + "0x15ac90165f8b45a80534228bdcb124a011f62fee"));
 //		GatePilotSymbol gatePilotSymbol = new GatePilotSymbol();
 //		gatePilotSymbol.setShowPair("GRIFFAIN_USDT");
 //		gatePilotSymbol.setAddress("KENJSUYLASHUMfHyy5o4Hp2FdNqZg1AsUPhfH2kYvEP");

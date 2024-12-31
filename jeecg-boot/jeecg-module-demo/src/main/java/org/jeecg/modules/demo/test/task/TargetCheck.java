@@ -18,7 +18,10 @@ import java.util.stream.Collectors;
 
 public class TargetCheck implements Job {
     public static void main(String[] args) {
-
+        String collect = "zailgo";
+        String url = "https://api.coingecko.com/api/v3/simple/price?ids=" + collect+ "&vs_currencies=usd";
+        String response = HttpRequest.get(url).execute().body();
+        System.out.println(response);
     }
 
     private IBigThingsWeb3Service iBigThingsWeb3Service;
