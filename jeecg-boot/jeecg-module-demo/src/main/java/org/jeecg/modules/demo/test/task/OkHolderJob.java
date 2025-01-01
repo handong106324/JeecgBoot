@@ -59,11 +59,12 @@ public class OkHolderJob implements Job {
 		pushMsgUtil = SpringContextUtils.getBean(PushMsgUtil.class);
 		IJeecgGatePilotService bean = SpringContextUtils.getBean(IJeecgGatePilotService.class);
 		String[] split = StringUtils.split(parameter, ",");
+		StringBuilder summaryVO = new StringBuilder();
 		for (String s : split) {
 			GatePilotSymbol search = bean.search(s);
 			if (null != search) {
 				try {
-					walletParse(search);
+					summaryVO.append(walletParse(search)).append("\n");
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
@@ -71,13 +72,14 @@ public class OkHolderJob implements Job {
 				log.error(parameter + " not found");
 			}
 		}
+		WeiXinAlert.getInstance().sendMessage(JSONObject.toJSONString(summaryVO, SerializerFeature.PrettyFormat), AlertType.BTC_ALERT);
 
 	}
 
 	private static String HOLDER_HEADER = "https://www.okx.com/priapi/v1/dx/market/v2/holders/ranking-list?chainId=501&tokenAddress=";
 
 
-	public void walletParse(GatePilotSymbol symbol) throws Exception {
+	public String walletParse(GatePilotSymbol symbol) throws Exception {
 		String apiKey = "3e13599d-959d-4caa-a800-ab57d96617b2";
 		String secretKey = "935A932780D9AFE7BEA6A779390A0249";
 		String passphrase = "Xinran0624f6zx@4qc";
@@ -123,8 +125,6 @@ public class OkHolderJob implements Job {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:00:00");
 		summaryVO.setDateTimeForHour(simpleDateFormat.format(new Date()));
 
-		WeiXinAlert.getInstance().sendMessage(JSONObject.toJSONString(summaryVO, SerializerFeature.PrettyFormat), AlertType.BTC_ALERT);
-
 		IJeecgSymbolSummaryService bean = SpringContextUtils.getBean(IJeecgSymbolSummaryService.class);
 		if (null != bean) {
 			SummaryVO search = bean.search(symbol.getShowPair(), summaryVO.getDateTimeForHour());
@@ -137,6 +137,7 @@ public class OkHolderJob implements Job {
 		}
 		//入库
 
+		return symbol.getShowPair() + ":[" + summaryVO.getTop10HoldAmountPercentage() + "/" + summaryVO.getTop30HoldAmountPercentage() +"]";
 	}
 
 	public static String changeToBase(String header) {
