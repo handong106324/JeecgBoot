@@ -85,6 +85,7 @@ public class OKAddressTransactionJob implements Job {
 					whaleTranctionsHistory.setTxhash(txHash);
 					whaleTranctionsHistory.setFromaddress(from);
 					whaleTranctionsHistory.setQueryCursor(cursor);
+					whaleTranctionsHistory.setMonitorAddress(gatePilotSymbol.getAddress());
 					historyList.add(whaleTranctionsHistory);
 				}
 

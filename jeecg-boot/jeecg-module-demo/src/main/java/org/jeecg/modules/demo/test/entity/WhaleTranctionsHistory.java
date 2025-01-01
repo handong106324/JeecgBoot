@@ -95,4 +95,7 @@ public class WhaleTranctionsHistory implements Serializable {
 	@Excel(name = "查询游标", width = 15)
     @ApiModelProperty(value = "查询游标")
     private String queryCursor;
+	@Excel(name = "被监控地址", width = 150)
+    @ApiModelProperty(value = "被监控地址")
+    private String monitorAddress;
 }
