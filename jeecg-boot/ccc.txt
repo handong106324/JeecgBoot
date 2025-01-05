@@ -1,14 +1,4 @@
-{"data":{"id":"1153985713836384256","name":"方圆\uD83E\uDDF2","username":"klys7788"}}
-{"data":{"id":"1066010297822003200","name":"Kasumi Miwa","username":"0xKasumi1"}}
-{"data":{"id":"1844325864252768258","name":"FoxZ\uD83E\uDD8A","username":"CryptoFoxZ"}}
-{"data":{"id":"1852674305517342720","name":"aixbt","username":"aixbt_agent"}}
-{"data":{"id":"944049288471986176","name":"Vava","username":"Valerioli86"}}
-{"data":{"id":"1697675285993299968","name":"BorisEVM","username":"BorisCryptoEVM"}}
-{"data":{"id":"28754022","name":"paulwei","username":"coolish"}}
-{"data":{"id":"1851730950566350850","name":"griffain","username":"griffaindotcom"}}
-{"data":{"id":"1577135787258306565","name":"Moontok Listing Alert","username":"MoontokListing"}}
-{"data":{"id":"44196397","name":"Elon Musk","username":"elonmusk"}}
-{"data":{"id":"1354297795742625794","name":"九条命","username":"CryptoKobe92"}}
+
 {"data":{"id":"902708127757467649","name":"sarah milady","username":"saracrypto_eth"}}
 {"data":{"id":"1703137177499054080","name":"&.","username":"amplifiedamp"}}
 {"data":{"id":"14379660","name":"Brian Armstrong","username":"brian_armstrong"}}
@@ -16,7 +6,6 @@
 {"data":{"id":"1735002478540881920","name":"Talking Web3","username":"0xTalkingWeb3"}}
 {"data":{"id":"423164349","name":"rasmr","username":"rasmr_eth"}}
 {"data":{"id":"1399509584067260418","name":"leochain","username":"leochain0"}}
-{"data":{"id":"1435517423889707012","name":"Kakashi","username":"kkashi_yt"}}
 {"data":{"id":"1639916473853280256","name":"dxrnelljcl","username":"dxrnelljcl"}}
 {"data":{"id":"1446957013444009991","name":"Tiger","username":"NotChaseColeman"}}
 {"data":{"id":"1774462036908642304","name":"lyxe","username":"cryptolyxe"}}
