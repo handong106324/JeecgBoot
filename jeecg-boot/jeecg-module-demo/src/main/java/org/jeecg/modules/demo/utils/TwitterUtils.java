@@ -186,6 +186,7 @@ public class TwitterUtils {
         ArrayList<NameValuePair> queryParameters;
         queryParameters = new ArrayList<>();
         queryParameters.add(new BasicNameValuePair("tweet.fields", "created_at"));
+        queryParameters.add(new BasicNameValuePair("max_results", "100"));
         uriBuilder.addParameters(queryParameters);
 
         HttpGet httpGet = new HttpGet(uriBuilder.build());
