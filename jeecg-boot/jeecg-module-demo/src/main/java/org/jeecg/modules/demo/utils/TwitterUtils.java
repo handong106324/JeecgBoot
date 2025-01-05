@@ -22,7 +22,11 @@ import java.util.ArrayList;
 
 public class TwitterUtils {
 
+    // 每日八号重置
     public static String bearerToken = "AAAAAAAAAAAAAAAAAAAAAMi3xQEAAAAA%2Ffh1d5w0Z66gg26xYrP3NZ44AIY%3DxJEA09cty2TEaWvzf90xSdvuj5jiwPhJPRaPsMTwkEOeSSTxRb";
+
+    // 每日五号
+    public static String bearerToken_ZHIXIN = "AAAAAAAAAAAAAAAAAAAAAIzDxwEAAAAAVhnrPkFhl%2BOub5zKTlPyFsQd%2BEA%3DRLxLU9l3waBEQmCPmjCgUxHkHwPgvBRkQFQWfjZi6soKXtkiGT";
 
 //    public static void main(String... args){
 //        Twitter twitter = Twitter.newBuilder()
