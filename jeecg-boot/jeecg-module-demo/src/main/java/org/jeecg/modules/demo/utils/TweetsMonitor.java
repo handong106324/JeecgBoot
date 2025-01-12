@@ -48,11 +48,11 @@ public class TweetsMonitor {
                 return;
             }
             for (String id : ids) {
-                String tweetsByUserId = TwitterUtils.getTweetsByUserId(id);
-                FileUtils.writeLines(new File("./tweets.txt"), Arrays.asList(tweetsByUserId), true);
-                Thread.sleep(16 * 60000);
+//                String tweetsByUserId = TwitterUtils.getTweetsByUserId(id);
+//                FileUtils.writeLines(new File("./tweets.txt"), Arrays.asList(tweetsByUserId), true);
+//                Thread.sleep(16 * 60000);
             }
-            FileUtils.writeLines(new File("./tweets.txt"), Arrays.asList("\n"), true);
+//            FileUtils.writeLines(new File("./tweets.txt"), Arrays.asList("\n"), true);
 
         } catch (Exception e) {
             e.printStackTrace();

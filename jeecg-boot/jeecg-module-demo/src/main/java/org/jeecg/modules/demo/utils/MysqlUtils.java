@@ -1,11 +1,11 @@
 package org.jeecg.modules.demo.utils;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import com.alibaba.druid.util.MySqlUtils;
+
+import java.sql.*;
 
 public class MysqlUtils {
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/jeecg-boot";
+    private static final String DB_URL = "jdbc:mysql://47.241.2.70:3306/jeecg-boot";
     private static final String USER = "root";
     private static final String PASS = "f6zx@4qc";
 
@@ -22,5 +22,31 @@ public class MysqlUtils {
             e.printStackTrace();
         }
         return connection;
+    }
+
+    public static void close(ResultSet resultSet, PreparedStatement preparedStatement, Connection connection) {
+        if (null != resultSet) {
+            try {
+                resultSet.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (null != preparedStatement) {
+            try {
+                preparedStatement.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (null != connection) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

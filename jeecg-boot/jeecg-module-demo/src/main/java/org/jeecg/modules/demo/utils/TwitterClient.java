@@ -13,6 +13,7 @@ import com.twitter.clientlib.api.UsersApi;
 import com.twitter.clientlib.model.Get2UsersMeResponse;
 import com.twitter.clientlib.model.User;
 import org.apache.commons.io.FileUtils;
+import org.jeecg.modules.demo.twitter.TweetsData;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,47 +25,32 @@ import java.util.stream.Collectors;
 public class TwitterClient {
 
     public static String[] users = new String[]{
-            "colarscolar",
-            "zen913",
-            "KookCapitalLLC",
-            "realdogen",
-            "CryptoTalkMan",
-            "moneyl0rd",
-            "yelotree",
-            "anon_rip",
-            "The_Solstice",
-            "zhusu",
-            "blknoiz06",
-            "Poe_Ether",
-            "HopiumPapi",
-            "EricCryptoman",
-            "CrashiusClay69",
-            "DogeSpaceXX",
-            "MustStopMurad",
-            "0xzerebro",
-            "349_CoolCoin",
-            "gabor"
+            "0xcryptowizard",
+            "jinruiliu7",
+            "PeterG2100"
     };
     private static String BEARER_TOKEN = "AAAAAAAAAAAAAAAAAAAAAMi3xQEAAAAA%2Ffh1d5w0Z66gg26xYrP3NZ44AIY%3DxJEA09cty2TEaWvzf90xSdvuj5jiwPhJPRaPsMTwkEOeSSTxRb"; // add bearer token here
 
     public static void main(String[] args) throws URISyntaxException, IOException, InterruptedException {
 
-        Arrays.stream(users).forEach(v -> {
-            String userInfo = null;
-            try {
-                Thread.sleep(16 * 60000);
-                userInfo = TwitterUtils.getUserByUserName(v);
-                FileUtils.writeLines(new File("./ccc.txt"), Arrays.asList(userInfo), true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        TweetsData tweetsByUserId = TwitterUtils.getTweetsByUserId("1525742352006287361");
 
-        });
+        System.out.println(tweetsByUserId);
+//        Arrays.stream(users).forEach(v -> {
+//            String userInfo = null;
+//            try {
+//                userInfo = TwitterUtils.getUserByUserName(v);
+//                FileUtils.writeLines(new File("./ccc.txt"), Arrays.asList(userInfo), true);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//
+//        });
 
 //        String search = TwitterUtils.search("@klys7788");
 //        System.out.println(search);
 
-//        String usageTweets = TwitterUtils.getUsers("klys7788");
+//        String usageTweets = TwitterUtils.getUsers(Arrays.stream(users).collect(Collectors.joining(",")));
 //        System.out.println(usageTweets);
 
 //        String vxNlcjoxMTUzOTg1NzEzODM2Mzg0MjU2 = TwitterUtils.getFollowers("VXNlcjoxMTUzOTg1NzEzODM2Mzg0MjU2");

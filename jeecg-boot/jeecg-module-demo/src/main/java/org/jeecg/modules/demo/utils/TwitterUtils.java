@@ -1,6 +1,7 @@
 package org.jeecg.modules.demo.utils;
 
 import cn.hutool.core.io.IoUtil;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
@@ -14,6 +15,8 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.jeecg.modules.demo.twitter.TweetMeta;
+import org.jeecg.modules.demo.twitter.TweetsData;
 
 import java.io.File;
 import java.io.IOException;
@@ -79,17 +82,6 @@ public class TwitterUtils {
 
 
     public static String getUsers(String usernames) throws IOException, URISyntaxException {
-
-        FileUtils.readLines(new File("./timeLimit.text")).forEach(v -> {
-            String[] split = StringUtils.split(v, "=");
-            if (split[0].equals("getUsers")) {
-                long l = Long.parseLong(split[1]);
-                if (System.currentTimeMillis() - l < 24 * 3600000) {
-                    throw new RuntimeException("本方法24小时才能调用一次哦");
-                }
-            }
-        });
-        FileUtils.write(new File("./timeLimit.text"), "getUsers=" + System.currentTimeMillis());
 
         String userResponse = null;
 
@@ -178,7 +170,7 @@ public class TwitterUtils {
 
 
 
-    public static String getTweetsByUserId(String userId) throws IOException, URISyntaxException {
+    public static TweetsData getTweetsByUserId(String userId) throws IOException, URISyntaxException {
         String tweetResponse = null;
 
         HttpClient httpClient = HttpClients.custom()
@@ -194,15 +186,21 @@ public class TwitterUtils {
         uriBuilder.addParameters(queryParameters);
 
         HttpGet httpGet = new HttpGet(uriBuilder.build());
-        httpGet.setHeader("Authorization", String.format("Bearer %s", bearerToken));
+        httpGet.setHeader("Authorization", String.format("Bearer %s", bearerToken_ZHIXIN));
         httpGet.setHeader("Content-Type", "application/json");
 
         HttpResponse response = httpClient.execute(httpGet);
         HttpEntity entity = response.getEntity();
         if (null != entity) {
             tweetResponse = EntityUtils.toString(entity, "UTF-8");
+            JSONObject jsonObject = JSONObject.parseObject(tweetResponse);
+            TweetMeta meta = jsonObject.getJSONObject("meta").toJavaObject(TweetMeta.class);
+            TweetsData tweetsData = new TweetsData();
+            tweetsData.load(jsonObject.getJSONArray("data"));
+            tweetsData.setMeta(meta);
+            return tweetsData;
         }
-        return tweetResponse;
+        return null;
     }
 
 
