@@ -32,12 +32,13 @@ public class DemoWeb3Controller {
      * @return
      */
     @GetMapping("/topInfo")
-    public Result<?> enhanceJavaListHttp(@RequestBody JSONObject params) {
-        log.info(" --- params：" + params.toJSONString());
+    public Result<?> enhanceJavaListHttp() {
+//    public Result<?> enhanceJavaListHttp(@RequestBody JSONObject params) {
+//        log.info(" --- params：" + params.toJSONString());
         IJeecgSymbolSummaryService bean = SpringContextUtils.getBean(IJeecgSymbolSummaryService.class);
 
         QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.orderByDesc("dateTimeForHour");
+        queryWrapper.orderByAsc("dateTimeForHour");
         List<SummaryVO> list = bean.list(queryWrapper);
 
 //        JSONArray dataList = params.getJSONArray("dataList");
