@@ -1,5 +1,8 @@
 package org.jeecg.modules.demo.utils;
 
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpUtil;
+import com.alibaba.fastjson.JSONObject;
 import io.gate.gateapi.ApiClient;
 import io.gate.gateapi.ApiException;
 import io.gate.gateapi.api.*;
@@ -9,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 public class GateApiUtils {
+
+
     public static void main(String[] args) {
         ApiClient client = new ApiClient();
         client.setApiKeySecret("4717da20946b7d7102a65563fb55d221", "733be1e46138cbe6f8c4ed07f6ff3bf773ce4ab7481671edf8a7b5c17cd7b491");
@@ -18,15 +23,15 @@ public class GateApiUtils {
         WalletApi walletApi = new WalletApi(client);
 
 
-
 //        spotApi.get
 
         try {
 
+            List<CurrencyPair> currencyPairs = spotApi.listCurrencyPairs();
 
-            for (SpotAccount spotAccount : spotApi.listSpotAccounts().execute()) {
-                System.out.println(spotAccount.getCurrency() + ":" + spotAccount.getAvailable() + ":" + spotAccount.getLocked());
-            }
+//            for (SpotAccount spotAccount : spotApi.listSpotAccounts().execute()) {
+//                System.out.println(spotAccount.getCurrency() + ":" + spotAccount.getAvailable() + ":" + spotAccount.getLocked());
+//            }
 
         } catch (ApiException e) {
             throw new RuntimeException(e);
