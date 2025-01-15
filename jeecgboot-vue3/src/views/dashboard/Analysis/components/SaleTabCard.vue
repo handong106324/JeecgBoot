@@ -25,13 +25,18 @@
             </a-col> -->
           </a-row>
         </a-tab-pane>
+
         <a-tab-pane tab="持仓" key="2">
           <a-row>
             <a-col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">
-              <Bar :chartData="barData.reverse()" :option="{ title: { text: '', textStyle: { fontWeight: 'lighter' } } }" height="40vh" :seriesColor="seriesColor" />
+              <LineMulti :chartData="lineMultiDataHolder" height="53vh" type="line" :option="{ legend: { top: 'top' } }"></LineMulti>
             </a-col>
-            <a-col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
-              <RankList title="门店销售排行榜" :list="rankList" />
+          </a-row>
+        </a-tab-pane>
+        <a-tab-pane tab="Top30" key="2">
+          <a-row>
+            <a-col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">
+              <LineMulti :chartData="lineMultiData3" height="53vh" type="line" :option="{ legend: { top: 'top' } }"></LineMulti>
             </a-col>
           </a-row>
         </a-tab-pane>
@@ -48,6 +53,12 @@ import LineMulti from '/@/components/chart/LineMulti.vue';
 import { getTopLineInfo } from '../api.ts'
 
 const lineMultiData = ref([]);
+
+const lineMultiData3 = ref([]);
+
+const lineMultiDataHolder = ref([]);
+
+
 // 日期
 
 getTopLineInfo({}).then((res) => {
@@ -55,6 +66,8 @@ getTopLineInfo({}).then((res) => {
     lineMultiData.value = [];
     res.result.forEach((item) => {
       lineMultiData.value.push({ name: item.dateTimeForHour, type: item.symbol, value: item.top10HoldAmountPercentage});
+      lineMultiData3.value.push({ name: item.dateTimeForHour, type: item.symbol, value: item.top30HoldAmountPercentage});
+      lineMultiDataHolder.value.push({ name: item.dateTimeForHour, type: item.symbol, value: item.totalHolderAmount});
     });
   }
 });
