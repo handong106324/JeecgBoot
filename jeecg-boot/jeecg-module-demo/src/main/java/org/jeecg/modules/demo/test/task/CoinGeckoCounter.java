@@ -97,6 +97,7 @@ public class CoinGeckoCounter {
 
         return holderTokens;
     }
+
     public Map<String,TokenPriceQuery> addressQuery() {
         Map<String, TokenPriceQuery> map = new HashMap<>();
         Connection connection = MysqlUtils.getConnection();
@@ -104,14 +105,16 @@ public class CoinGeckoCounter {
         ResultSet resultSet = null;
         List<HolderToken> holderTokens = new ArrayList<>();
         try {
-            preparedStatement = connection.prepareStatement("select  show_pair,address from gate_pilot_symbol");
+            preparedStatement = connection.prepareStatement("select  show_pair,address,last from gate_pilot_symbol");
             resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
                 String showPair = resultSet.getString("show_pair");
                 String address = resultSet.getString("address");
+                Double last = Double.parseDouble(resultSet.getString("last"));
                 TokenPriceQuery query = new TokenPriceQuery();
                 query.setChainIndex("501");
+                query.setPrice(last);
                 query.setTokenAddress(address);
                 map.put(showPair.split("_")[0].toLowerCase(), query);
             }
@@ -123,4 +126,5 @@ public class CoinGeckoCounter {
 
         return map;
     }
+
 }

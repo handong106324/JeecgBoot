@@ -8,4 +8,6 @@ public class TokenPriceQuery {
     private String chainIndex;
 
     private String tokenAddress;
+    private Double price;
+
 }
