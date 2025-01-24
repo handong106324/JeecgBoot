@@ -1,15 +1,27 @@
 package org.jeecg.modules.demo.test.task;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jeecg.common.util.SpringContextUtils;
 import org.jeecg.modules.demo.test.entity.GatePilotSymbol;
+import org.jeecg.modules.demo.test.entity.WhaleAddressMonitor;
+import org.jeecg.modules.demo.test.entity.WhaleHolder;
 import org.jeecg.modules.demo.test.service.IJeecgGatePilotService;
+import org.jeecg.modules.demo.utils.MysqlUtils;
 import org.jeecg.modules.demo.utils.OKWeb3Utils;
 import org.jeecg.modules.message.util.PushMsgUtil;
+import org.jeecg.modules.system.alert.AlertType;
+import org.jeecg.modules.system.alert.WeiXinAlert;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 示例不带参定时任务
@@ -19,10 +31,6 @@ import org.quartz.JobExecutionException;
 @Slf4j
 public class OKAddressBalanceJob implements Job {
 
-	PushMsgUtil pushMsgUtil;
-
-	private static String BASE_INDEX = "8453";
-	private static String SOL_INDEX = "501";
 	/**
 	 * 若参数变量名修改 QuartzJobController中也需对应修改
 	 */
@@ -35,41 +43,64 @@ public class OKAddressBalanceJob implements Job {
 
 	@Override
 	public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		pushMsgUtil = SpringContextUtils.getBean(PushMsgUtil.class);
-		IJeecgGatePilotService bean = SpringContextUtils.getBean(IJeecgGatePilotService.class);
-		String[] split = StringUtils.split(parameter, ",");
-		for (String s : split) {
-			GatePilotSymbol search = bean.search(s);
-			if (null != search) {
-				try {
-					walletParse(search);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			} else {
-				log.error(parameter + " not found");
+		text();
+	}
+
+	public void text() {
+		List<WhaleAddressMonitor> whaleAddressMonitors = MysqlUtils.queryList("select * from whale_address_monitor", WhaleAddressMonitor.class);
+		for (WhaleAddressMonitor whaleAddressMonitor : whaleAddressMonitors) {
+			try {
+				walletParse(whaleAddressMonitor);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
+		}
+	}
+
+	public void walletParse(WhaleAddressMonitor gatePilotSymbol) throws Exception {
+
+		JSONObject transactionByAddress = OKWeb3Utils.getBalancesByAddress(gatePilotSymbol.getAddress(), gatePilotSymbol.getChainId());
+
+		List<WhaleHolder> whaleHolders = MysqlUtils.queryList("select * from whale_holder where address = '" + gatePilotSymbol.getAddress() + "'", WhaleHolder.class);
+		Map<String, WhaleHolder> collect = whaleHolders.stream().collect(Collectors.toMap(WhaleHolder::getTokenaddress, v -> v));
+		List<String> sqls = new ArrayList<>();
+		String operations = gatePilotSymbol.getName() + " 新增操作: \n";
+		if (transactionByAddress != null && transactionByAddress.getString("code").equals("0")) {
+			JSONArray data = transactionByAddress.getJSONArray("data");
+
+			for (int i = 0; i < data.size(); i++) {
+				JSONArray tokenAddress = data.getJSONObject(i).getJSONArray("tokenAssets");
+				for (int i1 = 0; i1 < tokenAddress.size(); i1++) {
+					WhaleHolder whaleHolder = tokenAddress.getObject(i1, WhaleHolder.class);
+					WhaleHolder whaleHolder1 = collect.get(whaleHolder.getTokenaddress());
+					if (whaleHolder1 != null) {
+						if (whaleHolder.getBalance().intValue() == whaleHolder1.getBalance().intValue()) {
+							continue;
+						}
+						if (Math.abs(whaleHolder.getBalance().intValue() - whaleHolder1.getBalance().intValue())/whaleHolder.getBalance() <= 0.05) {
+							continue;
+						}
+						System.out.println(whaleHolder.getSymbol() + " update:" + (whaleHolder1.getBalance() - whaleHolder.getBalance()));
+						operations += "    " + whaleHolder.getSymbol() + " update:" + (whaleHolder1.getBalance() - whaleHolder.getBalance()) + "\n";
+						sqls.add(whaleHolder.updateSql());
+					} else {
+						System.out.println(whaleHolder.getSymbol() + " add " + whaleHolder.getBalance());
+						operations += "    " + whaleHolder.getSymbol() + " add:" + (whaleHolder.getBalance()) + "\n";
+						sqls.add(whaleHolder.insertSql());
+					}
+				}
+
+			}
+
+			if (sqls.size() > 0) {
+				WeiXinAlert.getInstance().sendMessage(operations, AlertType.EOS_ALERT);
+				MysqlUtils.batchUpdate(sqls);
+			}
+
+		} else {
+			System.out.println("fail:" + transactionByAddress.getString("msg"));
 		}
 
 	}
 
-
-
-	public void walletParse(GatePilotSymbol symbol) throws Exception {
-
-		System.out.println(OKWeb3Utils.getBalancesByAddress(symbol.getAddress(), "501"));
-
-	}
-	public static void main(String[] args) {
-		GatePilotSymbol gatePilotSymbol = new GatePilotSymbol();
-		gatePilotSymbol.setShowPair("GRIFFAIN_USDT");
-		gatePilotSymbol.setAddress("5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1");
-//		gatePilotSymbol.setAddress("0x9642b23ed1e01df1092b92641051881a322f5d4e");
-		OKAddressBalanceJob okHolderJob = new OKAddressBalanceJob();
-        try {
-            okHolderJob.walletParse(gatePilotSymbol);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

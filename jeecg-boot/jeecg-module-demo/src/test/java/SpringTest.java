@@ -57,6 +57,9 @@ public class SpringTest {
                         if (whaleHolder.getBalance().intValue() == whaleHolder1.getBalance().intValue()) {
                             continue;
                         }
+                        if (Math.abs(whaleHolder.getBalance().intValue() - whaleHolder1.getBalance().intValue())/whaleHolder.getBalance() <= 0.05) {
+                            continue;
+                        }
                         System.out.println(whaleHolder.getSymbol() + " update:" + (whaleHolder1.getBalance() - whaleHolder.getBalance()));
                         operations += "    " + whaleHolder.getSymbol() + " update:" + (whaleHolder1.getBalance() - whaleHolder.getBalance()) + "\n";
                         sqls.add(whaleHolder.updateSql());
