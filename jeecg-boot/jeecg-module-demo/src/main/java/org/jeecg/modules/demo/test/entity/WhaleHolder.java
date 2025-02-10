@@ -25,7 +25,7 @@ public class WhaleHolder implements Serializable {
 
     public String insertSql() {
         return "insert into whale_holder (id,chainindex, tokenaddress, symbol, address, balance, tokenprice, isrisktoken) " +
-                "values ('" + RandomUtil.randomNumbers(20) + "','" + chainindex + "', '" + tokenaddress + "', '" + symbol + "', '" + address + "', " + balance +
+                "values ('" + RandomUtil.randomString(10) + RandomUtil.randomNumbers(10) + "','" + chainindex + "', '" + tokenaddress + "', '" + symbol.replace("'", " ‘") + "', '" + address + "', " + balance +
                 ", " + tokenprice + ", '" + isrisktoken + "')";
     }
 

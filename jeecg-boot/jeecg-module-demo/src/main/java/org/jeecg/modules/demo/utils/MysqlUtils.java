@@ -78,25 +78,25 @@ public class MysqlUtils {
     }
 
     public static void batchUpdate(List<String> sqls) {
-        Connection connection = getConnection();
-        Statement statement = null;
+        Connection connection = MysqlUtils.getConnection();
+        Statement preparedStatement = null;
         try {
             connection.setAutoCommit(false);
-             statement = connection.createStatement();
-            for (String sql : sqls) {
-                statement.addBatch(sql);
+            preparedStatement = connection.createStatement();
+            for (int i = 0; i < sqls.size(); i++) {
+                preparedStatement.addBatch(sqls.get(i));
+                if (i % 50 == 0) {
+                    preparedStatement.executeBatch();
+                    connection.commit();
+                    System.out.println(i + " commit");
+                }
             }
-            statement.executeBatch();
+            preparedStatement.executeBatch();
             connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
-            try {
-                connection.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
         } finally {
-            close(null, statement, connection);
+            MysqlUtils.close(null, preparedStatement, connection);
         }
     }
 }

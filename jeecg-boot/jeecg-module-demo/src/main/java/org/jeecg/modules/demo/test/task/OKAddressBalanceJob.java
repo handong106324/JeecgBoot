@@ -18,6 +18,7 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -80,12 +81,12 @@ public class OKAddressBalanceJob implements Job {
 						if (Math.abs(whaleHolder.getBalance().intValue() - whaleHolder1.getBalance().intValue())/whaleHolder.getBalance() <= 0.05) {
 							continue;
 						}
-						System.out.println(whaleHolder.getSymbol() + " update:" + (whaleHolder1.getBalance() - whaleHolder.getBalance()));
-						operations += "    " + whaleHolder.getSymbol() + " update:" + (whaleHolder1.getBalance() - whaleHolder.getBalance()) + "\n";
+						operations += "    " + whaleHolder.getSymbol() + " update:" + (whaleHolder1.getBalance().intValue() - whaleHolder.getBalance().intValue())
+								+ "at " + whaleHolder.getTokenprice().toString() + " then income "
+						+ new BigDecimal(whaleHolder1.getBalance() * whaleHolder1.getTokenprice() - whaleHolder.getBalance() + whaleHolder.getTokenprice()).intValue() + "$\n";
 						sqls.add(whaleHolder.updateSql());
 					} else {
-						System.out.println(whaleHolder.getSymbol() + " add " + whaleHolder.getBalance());
-						operations += "    " + whaleHolder.getSymbol() + " add:" + (whaleHolder.getBalance()) + "\n";
+						operations += "    " + whaleHolder.getSymbol() + " add:" + (whaleHolder.getBalance().intValue()) + " at " +whaleHolder.getTokenprice().toString() + "\n";
 						sqls.add(whaleHolder.insertSql());
 					}
 				}
