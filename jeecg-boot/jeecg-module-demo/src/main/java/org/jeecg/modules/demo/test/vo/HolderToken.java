@@ -8,6 +8,6 @@ public class HolderToken {
 
     private Double costPrice;
 
-    private Integer amount;
+    private Double amount;
 
 }

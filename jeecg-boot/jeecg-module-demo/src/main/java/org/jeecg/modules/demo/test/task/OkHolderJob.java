@@ -15,6 +15,7 @@ import org.jeecg.modules.demo.test.entity.HolderRank;
 import org.jeecg.modules.demo.test.entity.SummaryVO;
 import org.jeecg.modules.demo.test.service.IJeecgGatePilotService;
 import org.jeecg.modules.demo.test.service.IJeecgSymbolSummaryService;
+import org.jeecg.modules.demo.test.vo.LiquidityInfo;
 import org.jeecg.modules.message.util.PushMsgUtil;
 import org.jeecg.modules.system.alert.AlertType;
 import org.jeecg.modules.system.alert.WeiXinAlert;
@@ -24,6 +25,7 @@ import org.quartz.JobExecutionException;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -61,10 +63,14 @@ public class OkHolderJob implements Job {
 		String[] split = StringUtils.split(parameter, ",");
 		StringBuilder summaryVO = new StringBuilder();
 		for (String s : split) {
+
 			GatePilotSymbol search = bean.search(s);
 			if (null != search) {
 				try {
-					summaryVO.append(walletParse(search)).append("\n");
+
+					String inf = checkQu(search.getAddress());
+					summaryVO.append(walletParse(search)).append("|").append(inf).append("\\n <br>");
+
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
@@ -72,13 +78,36 @@ public class OkHolderJob implements Job {
 				log.error(parameter + " not found");
 			}
 		}
+		// 流动性
 		WeiXinAlert.getInstance().sendMessage(JSONObject.toJSONString(summaryVO, SerializerFeature.PrettyFormat), AlertType.BTC_ALERT);
 
 	}
 
 	private static String HOLDER_HEADER = "https://www.okx.com/priapi/v1/dx/market/v2/holders/ranking-list?chainId=501&tokenAddress=";
 
+	private static String 流动性地址 = "https://web3.okx.com/priapi/v1/dx/market/pool/list?isWeb=1&chainId=501&tokenContractAddress=";
 
+	public String checkQu(String address) {
+		String s1 = HttpUtil.get(流动性地址 + address);
+		JSONObject jsonObject = JSONObject.parseObject(s1);
+		JSONArray jsonArray = jsonObject.getJSONObject("data").getJSONArray("list");
+		String info = "";
+		double max = 0;
+		for (int i = 0; i < jsonArray.size(); i++) {
+			JSONObject jsonObject1 = jsonArray.getJSONObject(i);
+			LiquidityInfo liquidityInfo = jsonObject1.toJavaObject(LiquidityInfo.class);
+			Double tokenAmountUsd = liquidityInfo.getPoolTokenInfoList().get(0).getTokenAmountUsd();
+			Double tokenAmountUsdTwo = liquidityInfo.getPoolTokenInfoList().get(1).getTokenAmountUsd();
+			if (Double.parseDouble(liquidityInfo.getLiquidity()) > max) {
+				max = Double.parseDouble(liquidityInfo.getLiquidity());
+				info = liquidityInfo.getPoolTokenInfoList().get(0).getTokenSymbol() + "/" + liquidityInfo.getPoolTokenInfoList().get(1).getTokenSymbol()
+						+ "=" + new BigDecimal(tokenAmountUsd /tokenAmountUsdTwo).setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
+			}
+
+		}
+		System.out.println(info);
+		return info;
+	}
 	public String walletParse(GatePilotSymbol symbol) throws Exception {
 		String apiKey = "3e13599d-959d-4caa-a800-ab57d96617b2";
 		String secretKey = "935A932780D9AFE7BEA6A779390A0249";
@@ -146,7 +175,9 @@ public class OkHolderJob implements Job {
 
 	public static void main(String[] args) {
 
-		System.out.println(APISignature.doGet(changeToBase(HOLDER_HEADER) + "0x15ac90165f8b45a80534228bdcb124a011f62fee"));
+		OkHolderJob okHolderJob = new OkHolderJob();
+		okHolderJob.checkQu("KENJSUYLASHUMfHyy5o4Hp2FdNqZg1AsUPhfH2kYvEP");
+//		System.out.println(APISignature.doGet(changeToBase(HOLDER_HEADER) + "0x15ac90165f8b45a80534228bdcb124a011f62fee"));
 //		GatePilotSymbol gatePilotSymbol = new GatePilotSymbol();
 //		gatePilotSymbol.setShowPair("GRIFFAIN_USDT");
 //		gatePilotSymbol.setAddress("KENJSUYLASHUMfHyy5o4Hp2FdNqZg1AsUPhfH2kYvEP");

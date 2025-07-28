@@ -2,16 +2,11 @@ package org.jeecg.modules.demo.test.task;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.litesoftwares.coingecko.CoinGeckoApiClient;
-import com.litesoftwares.coingecko.domain.Coins.CoinList;
-import com.litesoftwares.coingecko.domain.Coins.CoinTickerById;
-import com.litesoftwares.coingecko.domain.Search.Search;
-import com.litesoftwares.coingecko.impl.CoinGeckoApiClientImpl;
 import org.jeecg.modules.demo.test.vo.HolderToken;
 import org.jeecg.modules.demo.test.vo.TokenPriceQuery;
+import org.jeecg.modules.demo.utils.GateApiUtils;
 import org.jeecg.modules.demo.utils.MysqlUtils;
 import org.jeecg.modules.demo.utils.OKWeb3Utils;
-import org.springframework.boot.actuate.endpoint.web.WebOperation;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 public class CoinGeckoCounter {
-    public static void main(String[] args) {
+    public double accountTotal() {
 
         CoinGeckoCounter coinGeckoCounter = new CoinGeckoCounter();
         Map<String, TokenPriceQuery> map = coinGeckoCounter.addressQuery();
@@ -35,8 +30,6 @@ public class CoinGeckoCounter {
             TokenPriceQuery tokenPriceQuery = map.get(symbol);
             if (null != tokenPriceQuery) {
                 query.add(tokenPriceQuery);
-            } else {
-                System.out.println(symbol + " not found token");
             }
         }
 
@@ -54,9 +47,14 @@ public class CoinGeckoCounter {
         Double total = 0d;
         int tokenCount= 0;
         for (HolderToken holderToken : holderTokens) {
-            Integer amount = holderToken.getAmount();
+
+            Double amount = holderToken.getAmount();
             Double costPrice = holderToken.getCostPrice();
             String symbol = holderToken.getSymbol().toLowerCase();
+            if ("usdt".equalsIgnoreCase(holderToken.getSymbol().toLowerCase())) {
+                total += amount;
+                continue;
+            }
             TokenPriceQuery tokenPriceQuery = map.get(symbol);
             if (null != tokenPriceQuery) {
                 Double v = tokenPriceMap.get(tokenPriceQuery.getTokenAddress());
@@ -64,9 +62,22 @@ public class CoinGeckoCounter {
                     total += v * amount;
                     tokenCount ++;
                 }
+            } else {
+                String ke = symbol.toLowerCase() + "_usdt";
+                Map<String, Double> stringDoubleMap = GateApiUtils.getInstance().tickerSpot();
+                if (stringDoubleMap.containsKey(ke)) {
+                    Double v = stringDoubleMap.get(ke);
+                    if (v != null) {
+                        total += v * amount;
+                        tokenCount ++;
+                    }
+                } else {
+                    System.out.println(symbol + "not found");
+                }
             }
         }
         System.out.println(tokenCount + "合计：" + total);
+        return total;
     }
 
 
@@ -82,7 +93,7 @@ public class CoinGeckoCounter {
             while (resultSet.next()) {
                 String symbol = resultSet.getString("symbol");
                 double costPrice = resultSet.getDouble("cost_price");
-                int amount = resultSet.getInt("amount");
+                double amount = resultSet.getDouble("amount");
                 HolderToken holderToken = new HolderToken();
                 holderToken.setAmount(amount);
                 holderToken.setSymbol(symbol);

@@ -66,8 +66,7 @@ public class GateApiUtils {
         try {
             execute = apIlistTickersRequest.execute();
             for (Ticker ticker : execute) {
-                System.out.println(ticker.getCurrencyPair());
-                priceMap.put(ticker.getCurrencyPair(), Double.parseDouble(ticker.getLast()));
+                priceMap.put(ticker.getCurrencyPair().toLowerCase(), Double.parseDouble(ticker.getLast()));
             }
         } catch (ApiException e) {
             e.printStackTrace();
