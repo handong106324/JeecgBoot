@@ -1,3 +1,5 @@
+import { getTotalInfo } from "./api.ts";
+
 export interface GrowCardItem {
   icon: string;
   title: string;
@@ -43,11 +45,18 @@ export const growCardList: GrowCardItem[] = [
   },
 ];
 
+let total = 0;
+
+getTotalInfo().then((res) => {
+  total = res.total
+});
+  
+
 export const chartCardList: GrowCardItem[] = [
   {
     title: '总销售额',
     icon: 'visit-count|svg',
-    total: 126560,
+    total: total,
     value: 234.56,
     footer: '日均销售额',
   },

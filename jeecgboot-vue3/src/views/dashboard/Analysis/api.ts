@@ -3,7 +3,8 @@ import { defHttp } from '/@/utils/http/axios';
 enum Api {
   loginfo = '/sys/loginfo',
   visitInfo = '/sys/visitInfo',
-  topLineInfo = '/demo/chart/topInfo'
+  topLineInfo = '/demo/chart/topInfo',
+  totalInfo = '/demo/chart/total'
 }
 /**
  * 日志统计信息
@@ -19,3 +20,4 @@ export const getVisitInfo = (params) => defHttp.get({ url: Api.visitInfo, params
 
 export const getTopLineInfo = (params) => defHttp.get({ url: Api.topLineInfo, params }, { isTransformResponse: false });
 
+export const getTotalInfo = () => defHttp.get({ url: Api.totalInfo }, { isTransformResponse: false });
